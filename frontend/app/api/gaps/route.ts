@@ -6,8 +6,11 @@ export async function GET(request: NextRequest) {
   const apiUrl = process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return NextResponse.json({ error: "Backend is not configured" }, { status: 503 });
   const limit = request.nextUrl.searchParams.get("limit") ?? "3";
+  const sessionId = request.nextUrl.searchParams.get("session_id");
+  const params = new URLSearchParams({ limit });
+  if (sessionId) params.set("session_id", sessionId);
   try {
-    const response = await fetch(`${apiUrl.replace(/\/$/, "")}/gaps?limit=${encodeURIComponent(limit)}`, {
+    const response = await fetch(`${apiUrl.replace(/\/$/, "")}/gaps?${params.toString()}`, {
       headers: process.env.API_SHARED_SECRET ? { "X-API-Key": process.env.API_SHARED_SECRET } : {},
       cache: "no-store",
     });
